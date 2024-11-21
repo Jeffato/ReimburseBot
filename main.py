@@ -1,21 +1,41 @@
 import discord
 from config import TOKEN
+from discord.ext import commands
+import random
 
+description = ''
+
+# Intents list
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
-client = discord.Client(intents=intents)
+# Create a Bot instance
+bot = commands.Bot(command_prefix='?', description=description, intents=intents)
 
-@client.event
+# Event: on_ready
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print(f'We have logged in as {bot.user}')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
+# Command: roll
+@bot.command()
+async def roll(ctx, dice: str):
+    """Rolls a dice in NdN format."""
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await ctx.send('Format has to be in NdN!')
         return
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await ctx.send(result)
 
-client.run(TOKEN)
+# Command: test
+@bot.command()
+async def test(ctx, arg):
+    """Test command."""
+    await ctx.send(arg)
+
+# Run the bot
+bot.run(TOKEN)
