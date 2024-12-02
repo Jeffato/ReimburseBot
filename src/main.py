@@ -1,9 +1,11 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
-import random
 
-import os
 from dotenv import load_dotenv
+import os
+
+import random
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
@@ -20,26 +22,22 @@ bot = commands.Bot(command_prefix='?', description=description, intents=intents)
 # Event: on_ready
 @bot.event
 async def on_ready():
-    print(f'We have logged in as {bot.user}')
+    print(f'Logged in as {bot.user}')
+    try: 
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)!")
+    except Exception as e:
+        print(e)
 
-# Command: roll
-@bot.command()
-async def roll(ctx, dice: str):
-    """Rolls a dice in NdN format."""
-    try:
-        rolls, limit = map(int, dice.split('d'))
-    except Exception:
-        await ctx.send('Format has to be in NdN!')
-        return
+# Basic Commands
+@bot.tree.command(name="simple_slash")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message(f"Hey {interaction.user.mention}! This is a slash command!", ephemeral=True)
 
-    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
-    await ctx.send(result)
-
-# Command: test
-@bot.command()
-async def test(ctx, arg):
-    """Test command."""
-    await ctx.send(arg)
+@bot.tree.command(name="parrot")
+@app_commands.describe(thing_to_say = "What should I say?")
+async def say(interaction: discord.Interaction, thing_to_say : str):
+    await interaction.response.send_message(f"{interaction.user.name} (You) said: '{thing_to_say}'")
 
 # Run the bot
 bot.run(DISCORD_TOKEN)
