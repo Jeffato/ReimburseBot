@@ -1,8 +1,12 @@
 import discord
-from config import TOKEN
 from discord.ext import commands
 import random
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 description = ''
 
 # Intents list
@@ -38,4 +42,4 @@ async def test(ctx, arg):
     await ctx.send(arg)
 
 # Run the bot
-bot.run(TOKEN)
+bot.run(DISCORD_TOKEN)
