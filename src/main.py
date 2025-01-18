@@ -4,6 +4,7 @@ from discord.ext import commands
 
 from dotenv import load_dotenv
 import os
+import asyncio
 
 import random
 
@@ -55,19 +56,31 @@ async def say(interaction: discord.Interaction, thing_to_say : str):
 async def hello(ctx):
     await ctx.send(f'Hello, {ctx.author.mention}')
 
-# Example for embed- use for creating recieved confirmation for reciept request
-@bot.command()
-async def send(ctx):
-    embed_msg = discord.Embed(title="test", 
-                               description="kachow", 
-                               color=discord.Color.blue())
+
+# @bot.command()
+# async def send(ctx):
+#     embed_msg = discord.Embed(title="test", 
+#                                description="kachow", 
+#                                color=discord.Color.blue())
     
-    embed_msg.set_thumbnail(url=ctx.author.avatar)
-    embed_msg.add_field(name = "Field", value = "Value", inline = False)
-    embed_msg.set_footer(text="Footer Text", icon_url = ctx.author.avatar)
-    embed_msg.set_image(url = ctx.guild.icon)
+#     embed_msg.set_thumbnail(url=ctx.author.avatar)
+#     embed_msg.add_field(name = "Field", value = "Value", inline = False)
+#     embed_msg.set_footer(text="Footer Text", icon_url = ctx.author.avatar)
+#     embed_msg.set_image(url = ctx.guild.icon)
 
-    await ctx.send(embed=embed_msg)
+#     await ctx.send(embed=embed_msg)
 
-# Run the bot
-bot.run(DISCORD_TOKEN)
+async def load():
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.{filename[:-3]}")
+
+async def main():
+    async with bot:
+        await load()
+        await bot.start(DISCORD_TOKEN)
+        
+# # Run the bot
+# bot.run(DISCORD_TOKEN)
+
+asyncio.run(main())
