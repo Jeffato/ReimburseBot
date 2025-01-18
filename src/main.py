@@ -1,6 +1,6 @@
 import discord
 from discord import app_commands
-from discord.ui import Modal, TextInput, Select, View
+from discord.ui import Modal, TextInput, View
 from discord.ext import commands
 from datetime import datetime
 import traceback
@@ -33,31 +33,47 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-class Reimbursement_Request(Modal, title="Example Modal"):
-    name = discord.ui.TextInput(
-        label='Name',
-        placeholder='Your name here...',
+class Request(Modal, title="Reimbursement Request"):
+    category = discord.ui.TextInput(
+        label = "Select request Budget",
+        placeholder = 'Social'
+    )
+    
+    requestor = discord.ui.TextInput(
+        label = 'Name',
+        placeholder = 'Joe Shmoe'
     )
 
-    feedback = discord.ui.TextInput(
-        label='What do you think of this new feature?',
-        style=discord.TextStyle.long,
-        placeholder='Type your feedback here...',
-        required=False,
-        max_length=300,
+    amount_requested = discord.ui.TextInput(
+        label = "Amount (USD)",
+        style = discord.TextStyle.short,
+        placeholder = "12.99"
+    )
+
+    date_purchase = discord.ui.TextInput(
+        label = "Purchase Date (MM-DD-YYYY)",
+        style = discord.TextStyle.short,
+        placeholder = "04-01-2025"
+    )
+
+    description_purchase = discord.ui.TextInput(
+        label = 'Describe your purchase',
+        style = discord.TextStyle.long,
+        placeholder = 'Cups @ 12.99 for brolympics',
+        max_length = 300
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f'Thanks for your feedback, {self.name.value}!', ephemeral=True)
+        await interaction.response.send_message(f'Thanks for your feedback, {self.requestor}!', ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
         traceback.print_exception(type(error), error, error.__traceback__)
 
-@bot.tree.command(name="modal")
+@bot.tree.command(name="request")
 async def modal(interaction: discord.Interaction):
-    await interaction.response.send_modal(My_Modal())
+    await interaction.response.send_modal(Request())
 
 # Example tree commands
 @bot.tree.command(name="simple_slash")
