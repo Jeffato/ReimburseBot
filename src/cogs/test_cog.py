@@ -16,7 +16,7 @@ class Test_cog(commands.Cog):
         await ctx.send(f'Hello, {ctx.author.mention}')
 
     # Example tree commands
-    @app_commands.command(name="parrot")
+    @app_commands.command(name="parrot", description= "Silly command that repeats given input")
     @app_commands.describe(thing_to_say = "What should I say?")
     async def say(self, interaction: discord.Interaction, thing_to_say : str):
         await interaction.response.send_message(f"{interaction.user.name} (You) said: '{thing_to_say}'")

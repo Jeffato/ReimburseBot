@@ -33,9 +33,12 @@ class Reciept_Modal(discord.ui.Modal, title="Reimbursement Request"):
         placeholder = 'Cups @ 12.99 for brolympics',
         max_length = 300
     )
+    
+    # TODO: Make more readable date time?
+    submit_time = datetime.now()
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f'Thanks for your feedback, {self.requestor}!', ephemeral=True)
+        await interaction.response.send_message(f'Request submitted at {self.submit_time}', ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
@@ -50,7 +53,7 @@ class Requests(commands.Cog):
     async def on_ready(self):
         print(f'Linking Requests Cog')
     
-    @app_commands.command(name="request")
+    @app_commands.command(name="request", description = "Open a form to input receipt details")
     async def modal(self, interaction: discord.Interaction):
         await interaction.response.send_modal(Reciept_Modal())
 
