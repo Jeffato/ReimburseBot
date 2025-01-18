@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 class Test_cog(commands.Cog):
@@ -8,7 +9,19 @@ class Test_cog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'Linking Test_cog')
+    
+    # Example basic commands
+    @commands.command()
+    async def hello(self, ctx):
+        await ctx.send(f'Hello, {ctx.author.mention}')
 
+    # Example tree commands
+    @app_commands.command(name="parrot")
+    @app_commands.describe(thing_to_say = "What should I say?")
+    async def say(self, interaction: discord.Interaction, thing_to_say : str):
+        await interaction.response.send_message(f"{interaction.user.name} (You) said: '{thing_to_say}'")
+
+    # Example Embed
     @commands.command()
     async def send(self, ctx):
         embed_msg = discord.Embed(title="test", 
