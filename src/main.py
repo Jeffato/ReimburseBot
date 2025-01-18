@@ -1,6 +1,7 @@
 import discord
-from discord import app_commands
+from discord import ui, app_commands
 from discord.ext import commands
+from datetime import datetime
 
 from dotenv import load_dotenv
 import os
@@ -10,6 +11,7 @@ import random
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+GUILD_ID = os.getenv("GUILD_ID")
 description = ''
 
 # Intents list
@@ -24,11 +26,34 @@ bot = commands.Bot(command_prefix='?', description=description, intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-    try: 
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s)!")
-    except Exception as e:
-        print(e)
+    
+    # guild = discord.utils.get(bot.guilds, id = GUILD_ID)
+    guild = await bot.fetch_guild(GUILD_ID)
+    print(guild)
+    
+    if guild:
+        try: 
+            synced = await bot.tree.sync(guild=guild)
+            print(f"Synced {len(synced)} command(s)!")
+        except Exception as e:
+            print(f'Error syncing commands: {e}')
+    else:
+        print(f"Guild with ID {GUILD_ID} not found!")
+
+async def load():
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            cog_name = f"cogs.{filename[:-3]}"
+
+            try:
+                await bot.load_extension(cog_name)
+                print(f"Loaded Cog: {cog_name}")
+            except Exception as e:
+                print(f"Error loading {cog_name}: {e}")
+
+async def main():
+    await load()
+    await bot.start(DISCORD_TOKEN)
 
 # Example tree commands
 @bot.tree.command(name="simple_slash")
@@ -40,22 +65,29 @@ async def hello(interaction: discord.Interaction):
 async def say(interaction: discord.Interaction, thing_to_say : str):
     await interaction.response.send_message(f"{interaction.user.name} (You) said: '{thing_to_say}'")
 
+asyncio.run(main())
+# # Run the bot
+# bot.run(DISCORD_TOKEN)
 
-    '''
-    Receipt contents needed
-    
-    Budget Allocation-> ie Social, phil, fundraising
-    Brother Requesting Reimbursement
-    Amount Requested
-    Purchase Date
-    Description of Purchase
-    '''
+
+'''
+Receipt contents needed
+
+Budget Allocation-> ie Social, phil, fundraising
+Brother Requesting Reimbursement
+Amount Requested
+Purchase Date
+Description of Purchase
+'''
+
+
+
+
 
 # Example basic commands
 @bot.command()
 async def hello(ctx):
     await ctx.send(f'Hello, {ctx.author.mention}')
-
 
 # @bot.command()
 # async def send(ctx):
@@ -69,18 +101,3 @@ async def hello(ctx):
 #     embed_msg.set_image(url = ctx.guild.icon)
 
 #     await ctx.send(embed=embed_msg)
-
-async def load():
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            await bot.load_extension(f"cogs.{filename[:-3]}")
-
-async def main():
-    async with bot:
-        await load()
-        await bot.start(DISCORD_TOKEN)
-        
-# # Run the bot
-# bot.run(DISCORD_TOKEN)
-
-asyncio.run(main())
