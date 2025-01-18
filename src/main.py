@@ -29,7 +29,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-# Basic Commands
+# Example tree commands
 @bot.tree.command(name="simple_slash")
 async def hello(interaction: discord.Interaction):
     await interaction.response.send_message(f"Hey {interaction.user.mention}! This is a slash command!", ephemeral=True)
@@ -38,6 +38,36 @@ async def hello(interaction: discord.Interaction):
 @app_commands.describe(thing_to_say = "What should I say?")
 async def say(interaction: discord.Interaction, thing_to_say : str):
     await interaction.response.send_message(f"{interaction.user.name} (You) said: '{thing_to_say}'")
+
+
+    '''
+    Receipt contents needed
+    
+    Budget Allocation-> ie Social, phil, fundraising
+    Brother Requesting Reimbursement
+    Amount Requested
+    Purchase Date
+    Description of Purchase
+    '''
+
+# Example basic commands
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Hello, {ctx.author.mention}')
+
+# Example for embed- use for creating recieved confirmation for reciept request
+@bot.command()
+async def send(ctx):
+    embed_msg = discord.Embed(title="test", 
+                               description="kachow", 
+                               color=discord.Color.blue())
+    
+    embed_msg.set_thumbnail(url=ctx.author.avatar)
+    embed_msg.add_field(name = "Field", value = "Value", inline = False)
+    embed_msg.set_footer(text="Footer Text", icon_url = ctx.author.avatar)
+    embed_msg.set_image(url = ctx.guild.icon)
+
+    await ctx.send(embed=embed_msg)
 
 # Run the bot
 bot.run(DISCORD_TOKEN)
