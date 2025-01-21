@@ -8,7 +8,7 @@ class Test_cog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'Linking Test_cog')
+        print(f'Linking Test Cog')
     
     # Example basic commands
     @commands.command()
