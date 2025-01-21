@@ -8,6 +8,7 @@ class Receipt:
     category : str
     requestor : str
     amount : str
+    date_purchase : str
     description : str
     submit_time : str
     
@@ -67,7 +68,7 @@ class Requests(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'Linking Requests Cog')
-    
+
     @app_commands.command(name="request", description = "Open a form to input receipt details")
     async def modal(self, interaction: discord.Interaction):
         await interaction.response.send_modal(Reciept_Modal())
