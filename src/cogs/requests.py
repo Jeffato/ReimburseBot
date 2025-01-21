@@ -12,15 +12,16 @@ class Receipt:
     submit_time : str
     
     # TODO: Input validation
-    def __init__(self, category : str, requestor : str, amount : str, description : str, submit_time : str):
+    def __init__(self, category : str, requestor : str, amount : str, date_purchase : str, description : str, submit_time : str):
         self.category = category 
         self.requestor = requestor
         self.amount = amount
+        self.date_purchase = date_purchase
         self.description = description 
         self.submit_time = submit_time
 
     def toString(self):
-        return f'{self.submit_time}: {self.requestor} requested {self.amount} from {self.category} for {self.description}'
+        return f'{self.submit_time}: {self.requestor} requested ${self.amount} from {self.category} for {self.description}'
 
 class Reciept_Modal(discord.ui.Modal, title="Reimbursement Request"):
     category = discord.ui.TextInput(
@@ -47,14 +48,13 @@ class Reciept_Modal(discord.ui.Modal, title="Reimbursement Request"):
         placeholder = 'Cups @ 12.99 for brolympics',
         max_length = 300
     )
-    submit_time = datetime.now().strftime("%B %d %Y %I:%M%p")
+    submit_time = datetime.now().strftime("%B %d, %Y %I:%M %p")
 
     async def on_submit(self, interaction: discord.Interaction):
         request = Receipt(self.category, self.requestor, self.amount_requested, self.date_purchase, self.description_purchase, self.submit_time)
         
         #TODO: Send information somewhere
-
-        await interaction.response.send_message(f'Request submitted at {self.submit_time}')
+        await interaction.response.send_message(request.toString())
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
