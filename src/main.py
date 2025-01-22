@@ -41,7 +41,9 @@ async def on_ready():
         print(e)
 
 async def load():
-    for filename in os.listdir("./cogs"):
+    dir = os.path.join(os.getcwd(), "src/cogs")
+    
+    for filename in os.listdir(dir):
         if filename.endswith(".py"):
             await bot.load_extension(f"cogs.{filename[:-3]}")
 
