@@ -21,9 +21,11 @@ class Receipt:
         self.requestor = requestor
         self.description = description
 
+        #TODO: Check for non num or decimal point
         amount = re.sub(r',', "", amount)
         self.amount = float(amount)
-             
+        
+        #TODO: Check for date format
         self.date_purchase = datetime.strptime(date_purchase, "%Y-%m-%d").date()  # Convert to date object
         self.submit_time = submit_time
 
@@ -66,8 +68,8 @@ class Reciept_Modal(discord.ui.Modal, title="Reimbursement Request"):
                           self.description_purchase.value, 
                           self.submit_time)
         
-        for key, value in vars(request).items():
-            print(f'Property: {key}, val: {value}, type {type(value)}')
+        # for key, value in vars(request).items():
+        #     print(f'Property: {key}, val: {value}, type {type(value)}')
         
         self.submit_receipt = request
         await interaction.response.send_message(f'Processing... {request.toString()}', ephemeral = True)
