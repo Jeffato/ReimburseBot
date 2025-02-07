@@ -14,5 +14,6 @@ CREATE TABLE ledger (
     submit_time TIMESTAMP DEFAULT NOW()
     approval_time TIMESTAMP,
     reimburse_time TIMESTAMP,
-    approval_status approval_status DEFAULT 'Under-Review'
+    approval_status approval_status DEFAULT 'Under-Review',
+    image_url TEXT
 );
