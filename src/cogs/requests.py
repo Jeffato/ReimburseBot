@@ -65,15 +65,11 @@ class Requests(commands.Cog):
         await interaction.response.send_modal(modal)
         await modal.wait()
 
-        print("I am here")
         if not modal.submit_receipt:
             await interaction.followup.send("No receipt data was submitted.", ephemeral=True)
             return
         
         await interaction.followup.send(f'Please upload receipt image (Accepted file formats: png, jpg, jpeg', ephemeral = True)
-        
-        # def check(msg):
-        #     return msg.author == interaction.user and msg.attachments 
 
         try:
             msg = await self.bot.wait_for("message", 
