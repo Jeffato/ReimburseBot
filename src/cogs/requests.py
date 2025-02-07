@@ -80,7 +80,7 @@ class Requests(commands.Cog):
             await interaction.response.send_message(f"An error occurred: {e}", ephemeral=True)
 
     async def insert_receipt(self, request : Receipt):
-        table = os.getenv("queue_table")
+        table = os.getenv("ledger_table")
         print("Attempting to insert Receipt")
 
         async with self.bot.pg_pool.acquire() as connection:
