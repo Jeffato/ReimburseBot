@@ -17,7 +17,7 @@ class Receipt:
 
         #TODO: Check for non num or decimal point
         amount = re.sub(r',', "", amount)
-        self.amount = float(amount)
+        self.amount = round(float(amount), ndigits = 2)
         
         #TODO: Check for date format
         self.date_purchase = datetime.strptime(date_purchase, "%Y-%m-%d").date()  # Convert to date object
