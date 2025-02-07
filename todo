@@ -1,0 +1,24 @@
+Current branch (admin_db) TODO
+
+- Restricting commands to given user
+    -> I know this can be done by checking the user id.
+    -> Alternative, look at users with specific channels or roles
+
+- Accessing approval queue
+    -> Receipts with under-review tag in db
+
+- User input on admin side to approve/reject/edit request
+    -> Discord embedds?
+    -> Also will need to view image in the db
+
+- Commands between approving and reimburse status
+
+- Cashflow projections
+    -> Outstanding payment totals
+    -> Breakdown by budget category
+    -> Will need a representation for the overall budget tho, also uploading initial budget totals
+
+Past/Future TODO
+- More user input (text in modals and receipt images)
+- OCR for automatic receipt upload
+- Exporting to excel / google sheets integration
