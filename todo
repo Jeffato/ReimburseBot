@@ -1,17 +1,17 @@
 Current branch (admin_db) TODO
 
-- Restricting commands to given user
-    -> I know this can be done by checking the user id.
-    -> Alternative, look at users with specific channels or roles
-
-- Accessing approval queue
-    -> Receipts with under-review tag in db
-
-- User input on admin side to approve/reject/edit request
+- User input on admin side to approve/reject/edit request -> DONE
     -> Discord embedds?
     -> Also will need to view image in the db
 
-- Commands between approving and reimburse status
+- Accessing approval queue + link with db
+    -> Receipts with under-review tag in db
+
+- Updating DB after user interactions
+
+- Restricting commands to given user
+    -> I know this can be done by checking the user id.
+    -> Alternative, look at users with specific channels or roles
 
 - Cashflow projections
     -> Outstanding payment totals

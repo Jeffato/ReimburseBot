@@ -73,13 +73,13 @@ class Request_Manager(discord.ui.View):
     
     @discord.ui.button(label='Prev', style=discord.ButtonStyle.secondary)
     async def prev_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Opening edit menu...', ephemeral=True)
+        await interaction.response.send_message('Prev entry', ephemeral=True)
         self.value = False
         self.stop()
 
     @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
     async def next_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Opening edit menu...', ephemeral=True)
+        await interaction.response.send_message('Next entry', ephemeral=True)
         self.value = False
         self.stop()
 
