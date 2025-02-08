@@ -8,6 +8,7 @@ class Receipt:
     date_purchase : datetime
     description : str
     submit_time : datetime
+    image_url : str
     
     # TODO: more input validation might be needed
     def __init__(self, category : str, requestor : str, amount : str, date_purchase : datetime, description : str, submit_time : datetime):
