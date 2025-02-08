@@ -33,9 +33,5 @@ class Utility(commands.Cog):
         except Exception as e:
             await interaction.response.send_message(f"Database connection failed: {e}", ephemeral=True)
 
-    @app_commands.command(name="view_queue", description="Open pending reimbursement requests")
-    async def view(self, interaction: discord.Interaction):
-        pass   
-
 async def setup(bot):
     await bot.add_cog(Utility(bot))
