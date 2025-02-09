@@ -4,6 +4,45 @@ from discord.ext import commands
 
 from datetime import datetime
 from receipt import Receipt
+import os
+
+# TODO: Update logic for each button
+class Request_Manager(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+        self.update_flag = None
+
+    @discord.ui.button(label='Approve', style=discord.ButtonStyle.success)
+    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Approved Request', ephemeral=True)
+        self.value = "Approved"
+        self.update_flag = True
+        self.stop()
+    
+    @discord.ui.button(label='Edit', style=discord.ButtonStyle.primary)
+    async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Opening edit menu...', ephemeral=True)
+        self.value = False
+        self.stop()
+
+    @discord.ui.button(label='Reject', style=discord.ButtonStyle.danger)
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Rejected Request', ephemeral=True)
+        self.value = False
+        self.stop()
+    
+    @discord.ui.button(label='Prev', style=discord.ButtonStyle.secondary)
+    async def prev_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Prev entry', ephemeral=True)
+        self.value = False
+        self.stop()
+
+    @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
+    async def next_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Next entry', ephemeral=True)
+        self.value = False
+        self.stop()
 
 class Ledger_Admin(commands.Cog):
     def __init__(self, bot):
@@ -20,6 +59,8 @@ class Ledger_Admin(commands.Cog):
         # Create embed to display request details w/ buttons accept, edit, reject
         
         # Check if queue is empty
+
+        id = 7
 
         receipt = Receipt("Cats", 
                 "Helios", 
@@ -46,42 +87,32 @@ class Ledger_Admin(commands.Cog):
                         icon_url= self.bot.user.avatar.url)
 
         await interaction.response.send_message(embed = embed, view = view, ephemeral= True)
+        await view.wait()
 
-# TODO: Update logic for each button
-class Request_Manager(discord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.value = None
+        if view.update_flag:
+            print("Attempt Update")
 
-    @discord.ui.button(label='Approve', style=discord.ButtonStyle.success)
-    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Approved Request', ephemeral=True)
-        self.value = True
-        self.stop()
-    
-    @discord.ui.button(label='Edit', style=discord.ButtonStyle.primary)
-    async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Opening edit menu...', ephemeral=True)
-        self.value = False
-        self.stop()
+            try:
+                await self.update_status(id, view.value)
+            
+            except Exception as e:
+                print(f'Error: {e}')
 
-    @discord.ui.button(label='Reject', style=discord.ButtonStyle.danger)
-    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Rejected Request', ephemeral=True)
-        self.value = False
-        self.stop()
-    
-    @discord.ui.button(label='Prev', style=discord.ButtonStyle.secondary)
-    async def prev_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Prev entry', ephemeral=True)
-        self.value = False
-        self.stop()
 
-    @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
-    async def next_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Next entry', ephemeral=True)
-        self.value = False
-        self.stop()
+    async def update_status(self, id, approval_status):
+        table = os.getenv("ledger_table")
+        print(f'Attempting to update {id} to {approval_status}')
+
+        async with self.bot.pg_pool.acquire() as connection:
+            print("Got connection")
+            try:
+                query = f'''UPDATE {table} SET approval_status = $1 WHERE ID = $2'''
+                res = await connection.execute(query, approval_status, id)
+                
+                print("Query result:", res)  
+            
+            except Exception as e:
+                print(f"Error executing query: {e}") 
 
 async def setup(bot):
     await bot.add_cog(Ledger_Admin(bot))
