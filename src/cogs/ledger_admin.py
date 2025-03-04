@@ -6,42 +6,44 @@ from datetime import datetime
 from receipt import Receipt
 import os
 
-# TODO: Update logic for each button
+# View -> only handle the frontend ui/ pressing buttons
 class Request_Manager(discord.ui.View):
     def __init__(self):
         super().__init__()
         self.value = None
-        self.update_flag = None
+        self.db_update_flag = False
+        self.db_edit_flag = False
+        self.db_exit_flag = False
 
     @discord.ui.button(label='Approve', style=discord.ButtonStyle.success)
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message('Approved Request', ephemeral=True)
-        self.value = "Approved"
-        self.update_flag = True
+        self.value = "Pending-Reimbursement"
+        self.db_update_flag = True
         self.stop()
     
     @discord.ui.button(label='Edit', style=discord.ButtonStyle.primary)
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message('Opening edit menu...', ephemeral=True)
-        self.value = False
+        self.db_edit_flag = True
         self.stop()
 
     @discord.ui.button(label='Reject', style=discord.ButtonStyle.danger)
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message('Rejected Request', ephemeral=True)
-        self.value = False
+        self.value = "Rejected"
+        self.db_update_flag = True
         self.stop()
     
-    @discord.ui.button(label='Prev', style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label='Skip', style=discord.ButtonStyle.secondary)
     async def prev_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Prev entry', ephemeral=True)
-        self.value = False
+        await interaction.response.send_message('Skipping...', ephemeral=True)
         self.stop()
 
-    @discord.ui.button(label='Next', style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label='Exit', style=discord.ButtonStyle.secondary)
     async def next_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Next entry', ephemeral=True)
-        self.value = False
+        await interaction.response.send_message('', ephemeral=True)
+        self.db_exit_flag = True
         self.stop()
 
 class Ledger_Admin(commands.Cog):
@@ -57,14 +59,13 @@ class Ledger_Admin(commands.Cog):
         # SQL query to get all (or some) of the entries in ledger with 'under-review tag' -> order by oldest to newest
         # Create array, store in list of receipts
         queue = await self.get_approval_list()
+        await interaction.response.send_message("Opening queue...", ephemeral= True)
         
-        # TODO: Iterating through queue
         while queue:
             receipt = queue[0]
-
             view = Request_Manager()
 
-            # Create embed to display request details w/ buttons accept, edit, reject
+            # Create embed to display request details
             embed = discord.Embed(title="Request Details", description = receipt.description)
             embed.add_field(name = "Requested By:", value = receipt.requestor, inline = False)
             embed.add_field(name = "Budget", value = receipt.category, inline = True)
@@ -73,22 +74,32 @@ class Ledger_Admin(commands.Cog):
             embed.add_field(name = "Submitted On:", value = receipt.submit_time, inline=True)
             embed.add_field(name = "Purchased on:", value = receipt.date_purchase, inline=True)
             embed.set_image(url = receipt.image_url)
-            
-            # TODO: Change to actual numbers
             embed.set_footer(text = f"Requests in Queue: {len(queue)}",
                             icon_url= self.bot.user.avatar.url)
 
-            await interaction.response.send_message(embed = embed, view = view, ephemeral= True)
+            await interaction.followup.send(embed = embed, view = view, ephemeral= True)
             await view.wait()
 
-            if view.update_flag:
+            if view.db_exit_flag: 
+                await interaction.followup.send("Exiting Queue", ephemeral=True)
+                return
+
+            # TODO: Edit Update check with request modal?
+
+            # DB update for Approve/Rejected button
+            if view.db_update_flag:
                 print("Attempt Update")
 
                 try:
-                    await self.update_status(id, view.value)
+                    await self.update_status(receipt.id, view.value)
+                    interaction.followup.send("Request updated!")
                 
                 except Exception as e:
                     print(f'Error: {e}')
+
+            queue.pop(0)
+        
+        await interaction.followup.send("No more requests in the queue.", ephemeral=True)
 
     async def update_status(self, id, approval_status):
         table = os.getenv("ledger_table")
@@ -122,7 +133,8 @@ class Ledger_Admin(commands.Cog):
                             date_purchase=record["date_purchase"],
                             description=record["description"],
                             submit_time=record["submit_time"],
-                            image_url=record["image_url"]
+                            image_url=record["image_url"],
+                            id=record["id"] 
                         ) for record in records]
 
                 return receipts
