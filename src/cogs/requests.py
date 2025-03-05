@@ -11,30 +11,47 @@ from receipt import Receipt
 class Receipt_Modal(discord.ui.Modal, title="Reimbursement Request"):
     category = discord.ui.TextInput(
         label = "Select request Budget",
-        placeholder = 'Social'
+        placeholder = 'Social',
+        default = ""
     )
     requestor = discord.ui.TextInput(
         label = 'Name',
-        placeholder = 'Joe Shmoe'
+        placeholder = 'Joe Shmoe',
+        default = ""
     )
     amount_requested = discord.ui.TextInput(
         label = "Amount (USD)",
         style = discord.TextStyle.short,
-        placeholder = "12.99"
+        placeholder = "12.99",
+        default = ""
     )
     date_purchase = discord.ui.TextInput(
         label = "Purchase Date (YYYY-MM-DD)",
         style = discord.TextStyle.short,
-        placeholder = "2025-04-01"
+        placeholder = "2025-04-01",
+        default = ""
     )
     description_purchase = discord.ui.TextInput(
         label = 'Describe your purchase',
         style = discord.TextStyle.long,
         placeholder = 'Cups @ 12.99 for brolympics',
-        max_length = 300
+        max_length = 300,
+        default = ""
     )
-    submit_time = datetime.now()
-    submit_receipt = None
+
+    def __init__(self, receipt: Receipt = None):
+        super().__init__()
+
+        if receipt:
+            self.category.default = receipt.category
+            self.requestor.default = receipt.requestor
+            self.amount_requested.default = str(receipt.amount)  
+            self.date_purchase.default = str(receipt.date_purchase)
+            self.description_purchase.default = receipt.description
+            self.submit_time = receipt.submit_time
+        
+        self.submit_time = receipt.submit_time if receipt else datetime.now()
+        self.receipt_id = receipt.id if receipt else None  
 
     async def on_submit(self, interaction: discord.Interaction):
         request = Receipt(self.category.value, 
