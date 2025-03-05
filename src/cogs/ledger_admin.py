@@ -71,7 +71,7 @@ class Ledger_Admin(commands.Cog):
             embed.add_field(name = "Budget", value = receipt.category, inline = True)
             embed.add_field(name = "Amount", value = receipt.amount, inline=True)
             embed.add_field(name = "", value="", inline=False)
-            embed.add_field(name = "Submitted On:", value = receipt.submit_time, inline=True)
+            embed.add_field(name = "Submitted On:", value = receipt.submit_time.strftime('%Y-%m-%d %H:%M'), inline=True)
             embed.add_field(name = "Purchased on:", value = receipt.date_purchase, inline=True)
             embed.set_image(url = receipt.image_url)
             embed.set_footer(text = f"Requests in Queue: {len(queue)}",
