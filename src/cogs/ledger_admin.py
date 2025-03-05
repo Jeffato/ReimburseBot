@@ -42,7 +42,7 @@ class Request_Manager(discord.ui.View):
 
     @discord.ui.button(label='Exit', style=discord.ButtonStyle.secondary)
     async def next_entry(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('', ephemeral=True)
+        await interaction.response.send_message('Exiting Queue...', ephemeral=True)
         self.db_exit_flag = True
         self.stop()
 
@@ -81,10 +81,12 @@ class Ledger_Admin(commands.Cog):
             await view.wait()
 
             if view.db_exit_flag: 
-                await interaction.followup.send("Exiting Queue", ephemeral=True)
+                await interaction.followup.send("Exited Queue", ephemeral=True)
                 return
 
             # TODO: Edit Update check with request modal?
+            if view.db_edit_flag:
+                pass
 
             # DB update for Approve/Rejected button
             if view.db_update_flag:
@@ -92,7 +94,9 @@ class Ledger_Admin(commands.Cog):
 
                 try:
                     await self.update_status(receipt.id, view.value)
-                    interaction.followup.send("Request updated!")
+
+                    # TODO: Change to a log
+                    # interaction.followup.send("Request updated!")
                 
                 except Exception as e:
                     print(f'Error: {e}')
