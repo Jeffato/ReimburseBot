@@ -2,18 +2,21 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from datetime import datetime
-from receipt import Receipt
 import os
+from datetime import datetime
+
+from receipt import Receipt
+from receipt_modal import Receipt_Modal
 
 # View -> only handle the frontend ui/ pressing buttons
 class Request_Manager(discord.ui.View):
-    def __init__(self):
+    def __init__(self, receipt: Receipt):
         super().__init__()
         self.value = None
         self.db_update_flag = False
         self.db_edit_flag = False
         self.db_exit_flag = False
+        self.receipt = receipt
 
     @discord.ui.button(label='Approve', style=discord.ButtonStyle.success)
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -24,7 +27,10 @@ class Request_Manager(discord.ui.View):
     
     @discord.ui.button(label='Edit', style=discord.ButtonStyle.primary)
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('Opening edit menu...', ephemeral=True)
+        modal = Receipt_Modal(self.receipt)
+        await interaction.response.send_modal(modal)
+        await modal.wait()
+        self.receipt = modal.submit_receipt
         self.db_edit_flag = True
         self.stop()
 
@@ -45,7 +51,7 @@ class Request_Manager(discord.ui.View):
         await interaction.response.send_message('Exiting Queue...', ephemeral=True)
         self.db_exit_flag = True
         self.stop()
-
+    
 class Ledger_Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -63,7 +69,7 @@ class Ledger_Admin(commands.Cog):
         
         while queue:
             receipt = queue[0]
-            view = Request_Manager()
+            view = Request_Manager(receipt)
 
             # Create embed to display request details
             embed = discord.Embed(title="Request Details", description = receipt.description)
@@ -84,9 +90,9 @@ class Ledger_Admin(commands.Cog):
                 await interaction.followup.send("Exited Queue", ephemeral=True)
                 return
 
-            # TODO: Edit Update check with request modal?
             if view.db_edit_flag:
-                pass
+                queue[0] = view.receipt
+                continue
 
             # DB update for Approve/Rejected button
             if view.db_update_flag:
