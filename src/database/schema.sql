@@ -17,3 +17,9 @@ CREATE TABLE ledger (
     approval_status approval_status DEFAULT 'Under-Review',
     image_url TEXT
 );
+
+CREATE TABLE budget (
+    id SERIAL PRIMARY KEY,
+    category budget_category NOT NULL,
+    amount NUMERIC(10,2)
+);
