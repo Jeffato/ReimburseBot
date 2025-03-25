@@ -1,24 +1,35 @@
-Current branch (admin_db) TODO
+TODO
+
+user_db
+ - View pending request/status?
+    -> Link to name? Discord user for request?
+    -> Update database to take in discord user db
+
+Receipt OCR
+
+Intialization of bot (User setup) 
+- Docker?
+- Upload intial budget totals
+
+Future TODO
+- Fix permissions for cogs (admin specifically)
+- Exporting to excel / google sheets integration
+
+Completed Tasks
 
 - User input on admin side to approve/reject/edit request -> DONE
     -> Discord embedds?
     -> Also will need to view image in the db
 
-- Accessing approval queue + link with db
+- Accessing approval queue + link with db -> DONE
     -> Receipts with under-review tag in db
 
-- Updating DB after user interactions
+- Updating DB after user interactions -> DONE
 
-- Restricting commands to given user
+- Restricting commands to given user 
     -> I know this can be done by checking the user id.
     -> Alternative, look at users with specific channels or roles
 
-- Cashflow projections
+- Cashflow projections -> DONE
     -> Outstanding payment totals
     -> Breakdown by budget category
-    -> Will need a representation for the overall budget tho, also uploading initial budget totals
-
-Past/Future TODO
-- More user input (text in modals and receipt images)
-- OCR for automatic receipt upload
-- Exporting to excel / google sheets integration
